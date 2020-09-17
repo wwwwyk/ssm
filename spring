@@ -8,3 +8,18 @@ AOP：面向切面编程
         id:bean的唯一标识，为了跟其他的bean区分
         class:表示要创建的bean的完全限定名
     -->
+
+<!--给属性赋值使用property标签
+        name:表示属性的名称
+        value：表示具体的属性值
+        -->
+        
+/*
+* applicationContext:表示IOC容器的入口，想要获取对象的话，必须要创建该类
+*   该类有两个读取配置文件的实现类
+*       ClassPathXmlApplicationContext:表示从classpath中读取数据
+*       FileSystemXmlApplicationContext:表示从当前文件系统读取数据
+*
+* * */
+
+容器中的对象在容器创建完成之前就已经把对象创建好了
