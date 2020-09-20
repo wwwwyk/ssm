@@ -28,3 +28,101 @@ AOP：面向切面编程
 3、对象在IOC容器中存储的时候都是单例的，如果需要多例需要修改属性  scope="prototype"
 4、创建对象给属性赋值的时候是通过setter方法实现的, 写类的时候不能省略set方法
 5、对象的属性是由setter/getter方法决定的，而不是定义的成员属性  通过setXxx来注入，注入的名称为xxx
+
+  /*根据bean标签的id来获取对象*/
+//        Person person = context.getBean("person", Person.class);
+//        Person person2 = context.getBean("person",Person.class);
+//        System.out.println(person == person2);     true
+
+        /*根据bean的类型(type)来获取对象
+        * 注意：当通过类型进行获取的时候，如果存在两个相同类型对象，将无法完成获取工作
+        * */
+//        Person bean = context.getBean(Person.class);
+//        System.out.println(bean);
+
+/**
+         * 当需要从容器中获取对象的时候，最好要保留无参构造方法，因为底层的实现是反射
+         *
+         *  Class clazz = Person.class;
+         *  Object obj = clazz.newInstance();默认调用无参的构造方法，此方法已经被弃用
+         *  Object obj = class.getDeclaredConstructor().newInstance()
+         *
+         */
+         
+         
+根据属性值设置的时候，name的名称取决于set方法后面的参数首字符小写的名称
+使用构造器方法赋值的时候，参数的name属性是？由构造方法的参数名称决定的
+    name:表示参数列表的名称
+    value:表示实际的具体值
+    type:表示值的类型
+    index:表示值的下标，从0开始
+ 
+     <bean id="person" class="com.mashibing.bean.Person">
+        <property name="id" value="1"></property>
+        <property name="name" value="zhangsan"></property>
+        <property name="age" value="20"></property>
+        <property name="gender" value="男"></property>
+        <property name="date" value="2020/02/08"></property>&ndash;&gt;
+    </bean>
+ 
+ 
+ 
+当通过构造器方法赋值的时候，可以把name属性省略不写，但是要注意必须要保证参数值跟构造器的参数列表的顺序一致
+如果非要不一致的话，可以通过index的下标方式来标注，从0开始    
+    <bean id="person3" class="com.mashibing.bean.Person">
+        <constructor-arg  value="2"></constructor-arg>
+        <constructor-arg  value="男" index="3"></constructor-arg>
+        <constructor-arg  value="22"></constructor-arg>
+        <constructor-arg  value="lisi" index="1"></constructor-arg>
+    </bean>
+
+当有多个相同参数的构造方法存在的时候，默认情况下是覆盖的过程，后面的构造方法会覆盖前面的构造方法
+如果非要赋值给另外一个构造方法的话，可以使用type的参数来进行指定
+<bean id="person4" class="com.mashibing.bean.Person">
+        <constructor-arg  value="4"></constructor-arg>
+        <constructor-arg  value="wangwu" ></constructor-arg>
+        <constructor-arg  value="22" type="java.lang.Integer"></constructor-arg>
+    </bean>
+
+
+ 使用p命名空间来给属性赋值
+    <bean id="person5" class="com.mashibing.bean.Person" p:id="5" p:name="wangwu" p:age="25" p:gender="女">
+    </bean>
+    
+bean之间的继承关系
+可以使用abstract标签定义抽象bean，无法进行实例化
+
+    <!--创建bean的时候依赖关系
+    当bean对象被创建的时候，是按照xml配置文件定义的顺序创建的，谁在前，谁就先被创建
+        如果需要干扰创建的顺序，可以使用depends-on属性，depends-on的先创建
+    一般在实际工作中不必在意bean创建的顺序，无论谁先创建，需要依赖的对象在创建完成之后都会进行赋值操作
+    -->
+    
+<!--设置bean对象的作用域
+    通过scope属性可以指定当前bean的作用域
+    singleton：单例模式，从IOC容器中获取的都是同一个对象，默认的作用域
+    prototype：多例模式，从IOC容器中获取的对象每次都是新创建
+    在spring4.x的版本中还包含另外两种作用域：
+    request：每次发送请求都会有一个新的对象
+    session：每一次会话都会有一个新的对象
+            几乎不用，从来没用过，因此在5版本的时候被淘汰了
+    注意：
+        如果是singleton作用域的话，每次在创建IOC容器完成之前此对象已经创建完成
+        如果是prototype作用域的话，每次是在需要用到此对象的时候才会创建
+    -->
+    
+<!--利用工厂方法创建bean-->
+    <!--静态工厂（两层：车场、车子方法）：类名.静态方法（）-->
+<!--    <bean id="person" class="com.mashibing.factory.PersonStaticFactory" factory-method="getInstance">-->
+<!--        <constructor-arg value="zhangsan"></constructor-arg>-->
+<!--    </bean>-->
+    <!--实例(抽象工厂)工厂（三层：车场、车子型号、车子方法）（推荐使用，扩展性好）：先创建工厂实例，然后调用工厂实例的方法
+        factory-bean:表示具体工厂类的实例
+        factory-method:表示具体工厂实例的方法
+    -->
+<!--    <bean id="instanceFactory" class="com.mashibing.factory.PersonInstanceFactory"></bean>-->
+<!--    <bean id="person2" class="com.mashibing.bean.Person" factory-bean="instanceFactory" factory-method="getInstance">-->
+<!--        <constructor-arg value="lisi"></constructor-arg>-->
+<!--    </bean>-->
+
+<!--    <bean id="myFactoryBean" class="com.mashibing.factory.MyFactoryBean"></bean>-->
